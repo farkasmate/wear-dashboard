@@ -11,12 +11,16 @@ import android.support.v4.app.NotificationCompat;
 import android.support.wearable.activity.WearableActivity;
 import android.widget.TextView;
 
-import y2k.dashboard.data.DashboardContent;
+import y2k.dashboard.data.DashboardContentProvider;
 import y2k.dashboard.data.JsonContentProvider;
+import y2k.dashboard.data.Notifiable;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements Notifiable {
 
     private TextView contentView;
+    private DashboardContentProvider contentProvider;
+    private String title   = "";
+    private String content = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,16 +28,28 @@ public class MainActivity extends WearableActivity {
         setContentView(R.layout.main);
         setAmbientEnabled();
 
-        if (!DashboardContent.isInitialized()) {
-            DashboardContent.setContentProvider(new JsonContentProvider());
-        }
-
         contentView = (TextView) findViewById(R.id.content);
 
-        contentView.setText(DashboardContent.getContent());
+        contentProvider = new JsonContentProvider();
+        contentProvider.setContentHolder(this);
+        contentProvider.update();
+
+        updateViewsAndNotifications();
+    }
+
+    @Override
+    public void onNotification() {
+        title = contentProvider.getContentTitle();
+        content = contentProvider.getContent();
+
+        updateViewsAndNotifications();
+    }
+
+    private void updateViewsAndNotifications() {
+        contentView.setText(content);
+        contentView.invalidate();
 
         Context context = getApplicationContext();
-        Intent displayIntent = new Intent(context, NotificationActivity.class);
 
         Intent mainIntent = new Intent(context, MainActivity.class);
         NotificationCompat.Action openAction = new NotificationCompat.Action.Builder(
@@ -51,11 +67,12 @@ public class MainActivity extends WearableActivity {
 
         Notification notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(DashboardContent.getContentTitle())
-                .setContentText(DashboardContent.getContent())
+                .setContentTitle(title)
+                .setContentText(content)
                 .setCategory(Notification.CATEGORY_STATUS)
                 .extend(wearableExtender)
                 .build();
+
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(0, notification);
     }
 }

@@ -7,4 +7,7 @@ public interface DashboardContentProvider {
     public String getContentTitle();
 
     public String getContent();
+
+    public void setContentHolder(Notifiable notifiable);
+
 }

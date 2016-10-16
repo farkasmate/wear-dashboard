@@ -4,6 +4,7 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -12,12 +13,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
-        <activity
-            android:name=".NotificationActivity"
-            android:allowEmbedded="true"
-            android:exported="true"
-            android:taskAffinity=""
-            android:theme="@android:style/Theme.DeviceDefault.Light" />
 
         <uses-library
             android:name="com.google.android.wearable"
